@@ -6,19 +6,23 @@ Google Code[Tensoflow]: https://github.com/tensorflow/docs/blob/r2.0rc/site/en/r
 
 
 U-Net:
+<p align="center">
+  <img src="unet.png">
+</p>
 
-<img align="center" src="unet.png">
 
 Patch-Net:
 
-<img align="center" src="patchnet.png">
 
+<p align="center">
+  <img src="patchnet.png">
+</p>
 
 
 Pix2Pix:
-
-<img align="center" src="pix2pix.png">
-
+<p align="center">
+  <img src="pix2pix.png">
+</p>
 
 # Result
 
