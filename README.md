@@ -6,13 +6,19 @@ Google Code[Tensoflow]: https://github.com/tensorflow/docs/blob/r2.0rc/site/en/r
 
 
 U-Net:
+Input shape:(32, 32, 3)    
+              
+Output shape:(32, 32, 3)
+
 <p align="center">
   <img src="unet.png">
 </p>
 
 
 Patch-Net:
-
+Input shape:(32, 32, 3), (32, 32, 3)    
+              
+Output shape:(9, 9, 1)
 
 <p align="center">
   <img src="patchnet.png">
