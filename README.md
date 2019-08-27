@@ -7,13 +7,15 @@ Google Code[Tensoflow]: https://github.com/tensorflow/docs/blob/r2.0rc/site/en/r
 
 U-Net:
 
-![](unet.png) 
+<img align="center" src="unet.png">
 
 Patch-Net:
 
-![](patchnet.png)
+<img align="center" src="patchnet.png">
+
 
 
 Pix2Pix:
 
-![](pix2pix.png)
+<img align="center" src="pix2pix.png">
+
