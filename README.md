@@ -1,6 +1,6 @@
 # Modified Pix2Pix
 
-Reimplementation the Pix2Pix model for a small image size dataset like C with less parameters and different Patch-Net architecture
+Reimplementation the Pix2Pix model for a small image size dataset(like Cifar10) with less parameters and different PatchNet architecture
 
 # Important links
 [Google code[Tensoflow]](https://github.com/tensorflow/docs/blob/r2.0rc/site/en/r2/tutorials/generative/pix2pix.ipynb) </br>
@@ -24,7 +24,7 @@ U-Net: The Generator in pix2pix resembles an auto-encoder. The Skip Connections 
 
 
 ## Discriminator
-Patch-Net: The PatchGAN discriminator used in pix2pix is another unique component to this design. The PatchGAN / Markovian discriminator works by classifying individual (N x N) patches in the image as “real vs. fake”, opposed to classifying the entire image as “real vs. fake”. The authors reason that this enforces more constraints that encourage sharp high-frequency detail. Additionally, the PatchGAN has fewer parameters and runs faster than classifying the entire image.
+Patch-Net: The PatchGAN discriminator used in pix2pix is another unique component to this design. The PatchGAN discriminator works by classifying individual (N x N) patches in the image as “real vs. fake”, opposed to classifying the entire image as “real vs. fake”. The authors reason that this enforces more constraints that encourage sharp high-frequency detail. Additionally, the PatchGAN has fewer parameters and runs faster than classifying the entire image.
 
 
 <b>Input shape:</b> (32, 32, 3), (32, 32, 3)    
