@@ -1,10 +1,10 @@
 # Modified Pix2Pix
 
-Reimplementation the Pix2Pix model for a small dataset with less parameters and different Patch-Net architecture
+Reimplementation the Pix2Pix model for a small image size dataset like C with less parameters and different Patch-Net architecture
 
 [Google code[Tensoflow]](https://github.com/tensorflow/docs/blob/r2.0rc/site/en/r2/tutorials/generative/pix2pix.ipynb) </br>
-[Paper](https://arxiv.org/abs/1611.07004) </br>
-
+[Original paper](https://arxiv.org/abs/1611.07004) </br>
+[Project page](https://phillipi.github.io/pix2pix/) </br>
 
 U-Net: The Generator in pix2pix resembles an auto-encoder. The Skip Connections in the U-Net differentiate it from a standard Encoder-decoder architecture. The Generator takes in the Image to be translated and compresses it into a low-dimensional, “Bottleneck”, vector representation. The Generator then learns how to upsample this into the output image. The U-Net is similar to ResNets in the way that information from earlier layers are integrated into later layers. The U-Net skip connections are also interesting because they do not require any resizing, projections etc. since the spatial resolution of the layers being connected already match each other.
 
