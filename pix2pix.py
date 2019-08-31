@@ -3,73 +3,8 @@ from keras.layers import *
 from keras import backend as keras
 from keras.optimizers import Adam
 from keras.models import Model
-
-
-def define_pix2pix(g_model, d_model, image_shape):
-    # make weights in the discriminator not trainable
-    d_model.trainable = False
-    # define the source image
-    in_src = Input(shape=image_shape)
-    # connect the source image to the generator input
-    gen_out = g_model(in_src)
-    # connect the source input and generator output to the discriminator input
-    dis_out = d_model([in_src, gen_out])
-    # src image as input, generated image and classification output
-    model = Model(in_src, [dis_out, gen_out])
-    # compile model
-    opt = Adam(lr=0.0002, beta_1=0.5)
-    model.compile(loss=['binary_crossentropy', 'mae'], optimizer=opt, loss_weights=[1,100])
-    return model
-
-
-
-# select a batch of random samples, returns images and target
-def generate_real_samples(dataset, n_samples):
-    # choose random instances
-    ix = np.random.randint(0, dataset.shape[0], n_samples)
-    # retrieve selected images
-    X1, X2 = dataset[ix], dataset[ix]
-    # generate 'real' class labels (1)
-    y = np.ones((n_samples, 9, 9, 1))
-    return [X1, X2], y
-
-
-
-# generate a batch of images, returns images and targets
-def generate_fake_samples(g_model, samples):
-    # generate fake instance
-    X = g_model.predict(samples)
-    # create 'fake' class labels (0)
-    y = np.zeros((len(X), 9, 9, 1))
-    return X, y
-
-
-
-# train pix2pix model
-def train(d_model, g_model, gan_model, dataset, n_epochs=1, n_batch=1):
-    # calculate the number of batches per training epoch
-    bat_per_epo = int(len(dataset) / n_batch)
-    # calculate the number of training iterations
-    n_steps = bat_per_epo * n_epochs
-    # manually enumerate epochs
-    for i in range(n_steps):
-        # select a batch of real samples
-        [X_realA, X_realB], y_real = generate_real_samples(dataset, n_batch)
-        # generate a batch of fake samples
-        X_fakeB, y_fake = generate_fake_samples(g_model, X_realA)
-        # update discriminator for real samples
-        d_loss1 = d_model.train_on_batch([X_realA, X_realB], y_real)
-        # update discriminator for generated samples
-        d_loss2 = d_model.train_on_batch([X_realA, X_fakeB], y_fake)
-        # update the generator
-        g_loss, _, _ = gan_model.train_on_batch(X_realA, [y_real, X_realB])
-        # save the model each epoch
-        if i % 50000 == 0:
-            print('>%d/%d, d1[%.3f] d2[%.3f] g[%.3f]' % (i+1, n_steps, d_loss1, d_loss2, g_loss))
-            g_model.save('unet' + str(i) +'.h5')
-            d_model.save('patchnet' + str(i) +'.h5')
-            gan_model.save('pix2pix' + str(i) +'.h5')
-
+from keras.datasets import cifar10
+import numpy as np
 
 
 def define_unet():
@@ -158,9 +93,74 @@ def define_patchnet():
     return patchnet
 
 
+def define_pix2pix(g_model, d_model, image_shape):
+    # make weights in the discriminator not trainable
+    d_model.trainable = False
+    # define the source image
+    in_src = Input(shape=image_shape)
+    # connect the source image to the generator input
+    gen_out = g_model(in_src)
+    # connect the source input and generator output to the discriminator input
+    dis_out = d_model([in_src, gen_out])
+    # src image as input, generated image and classification output
+    model = Model(in_src, [dis_out, gen_out])
+    # compile model
+    opt = Adam(lr=0.0002, beta_1=0.5)
+    model.compile(loss=['binary_crossentropy', 'mae'], optimizer=opt, loss_weights=[1,100])
+    return model
 
+
+
+# select a batch of random samples, returns images and target
+def generate_real_samples(dataset, n_samples):
+    # choose random instances
+    ix = np.random.randint(0, dataset.shape[0], n_samples)
+    # retrieve selected images
+    X1, X2 = dataset[ix], dataset[ix]
+    # generate 'real' class labels (1)
+    y = np.ones((n_samples, 9, 9, 1))
+    return [X1, X2], y
+
+
+
+# generate a batch of images, returns images and targets
+def generate_fake_samples(g_model, samples):
+    # generate fake instance
+    X = g_model.predict(samples)
+    # create 'fake' class labels (0)
+    y = np.zeros((len(X), 9, 9, 1))
+    return X, y
+
+
+
+# train pix2pix model
+def train(d_model, g_model, gan_model, dataset, n_epochs=20, n_batch=1):
+    # calculate the number of batches per training epoch
+    bat_per_epo = int(len(dataset) / n_batch)
+    # calculate the number of training iterations
+    n_steps = bat_per_epo * n_epochs
+    # manually enumerate epochs
+    for i in range(n_steps):
+        # select a batch of real samples
+        [X_realA, X_realB], y_real = generate_real_samples(dataset, n_batch)
+        # generate a batch of fake samples
+        X_fakeB, y_fake = generate_fake_samples(g_model, X_realA)
+        # update discriminator for real samples
+        d_loss1 = d_model.train_on_batch([X_realA, X_realB], y_real)
+        # update discriminator for generated samples
+        d_loss2 = d_model.train_on_batch([X_realA, X_fakeB], y_fake)
+        # update the generator
+        g_loss, _, _ = gan_model.train_on_batch(X_realA, [y_real, X_realB])
+        # save the model each epoch
+        if i % len(dataset) == 0:
+            print('>%d/%d, d1[%.3f] d2[%.3f] g[%.3f]' % (i+1, n_steps, d_loss1, d_loss2, g_loss))
+            g_model.save('unet' + str(i) +'.h5')
+            d_model.save('patchnet' + str(i) +'.h5')
+            gan_model.save('pix2pix' + str(i) +'.h5')
+            
+            
 def main():
-    (x_train, _), (_, _) = keras.datasets.cifar10.load_data()
+    (x_train, _), (_, _) = cifar10.load_data()
 
     # normalize data
     x_train = x_train / 127.5 - 1
@@ -173,6 +173,7 @@ def main():
 
     # training
     train(patchnet, unet, pix2pix, dataset=x_train)
+    
     
     
 if __name__ == '__main__':
