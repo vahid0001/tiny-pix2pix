@@ -2,8 +2,8 @@
 
 Reimplementation the Pix2Pix model for a small dataset with less parameters and different Patch-Net architecture
 
-[Google Code[Tensoflow]] (https://github.com/tensorflow/docs/blob/r2.0rc/site/en/r2/tutorials/generative/pix2pix.ipynb)
-[Paper] (https://arxiv.org/abs/1611.07004)
+[Google Code[Tensoflow]](https://github.com/tensorflow/docs/blob/r2.0rc/site/en/r2/tutorials/generative/pix2pix.ipynb)
+[Paper](https://arxiv.org/abs/1611.07004)
 
 
 U-Net:
