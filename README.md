@@ -36,7 +36,7 @@ Pix2Pix:
 </p>
 
 <p align="center">
-  <img src="model_summary.png">
+  <img src="model_summary.PNG">
 </p>
 
 # Result
