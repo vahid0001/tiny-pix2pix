@@ -35,10 +35,6 @@ Pix2Pix:
   <img src="pix2pix.png">
 </p>
 
-<p align="center">
-  <img src="model_summary.PNG">
-</p>
-
 # Result
 
 It is trained on the Cifar10 dataset to reconstruct every input image(auto-encoding) and it has 0.006 MAE on the test set.
