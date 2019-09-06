@@ -44,4 +44,4 @@ Patch-Net: The PatchGAN discriminator used in pix2pix is another unique componen
 
 # Result
 
-The model is trained for 3 epochs on the Cifar10 dataset to reconstruct every input image(auto-encoding) and it can reconstruct images with the MAE of 0.0113 on the test set.
+The model is trained for 3 epochs on the Cifar10 dataset to reconstruct every input image (auto-encoding) and it can reconstruct images with the MAE of 0.0113 on the test set.
