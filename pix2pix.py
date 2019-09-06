@@ -57,10 +57,10 @@ def define_unet():
 
 def define_patchnet():
     # PatchNet
-    src_image = Input(shape=(32, 32, 3))
+    source_image = Input(shape=(32, 32, 3))
     target_image = Input(shape=(32, 32, 3))
 
-    merged = Concatenate()([src_image, target_image])
+    merged = Concatenate()([source_image, target_image])
 
     x = Conv2D(64, 3, strides=2)(merged)
     x = LeakyReLU(alpha=0.2)(x)
@@ -83,76 +83,72 @@ def define_patchnet():
 
     x = Conv2D(1, 3, activation="sigmoid", padding="same")(x)
 
-    patchnet = Model(input=[src_image, target_image], output=x)
+    patchnet = Model(input=[source_image, target_image], output=x)
     patchnet.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy')
     
     return patchnet
 
 
-def define_pix2pix(g_model, d_model, image_shape):
-    # make weights in the discriminator not trainable
-    d_model.trainable = False
-    # define the source image
-    in_src = Input(shape=image_shape)
-    # connect the source image to the generator input
-    gen_out = g_model(in_src)
-    # connect the source input and generator output to the discriminator input
-    dis_out = d_model([in_src, gen_out])
-    # src image as input, generated image and classification output
-    model = Model(in_src, [dis_out, gen_out])
-    # compile model
-    opt = Adam(lr=0.0002, beta_1=0.5)
-    model.compile(loss=['binary_crossentropy', 'mae'], optimizer=opt, loss_weights=[1,100])
-    return model
+
+def define_pix2pix(generator, discriminator, image_shape):
+    discriminator.trainable = False
+    
+    input_source = Input(shape=image_shape)
+    generator_output = generator(input_source)
+
+    discriminator_output = discriminator([input_source, generator_output])
+
+    pix2pix = Model(input_source, [discriminator_output, generator_output])
+    optimizer = Adam(lr=0.0002, beta_1=0.5)
+    pix2pix.compile(loss=['binary_crossentropy', 'mae'], optimizer=optimizer, loss_weights=[1,100])
+    
+    return pix2pix
 
 
 
-# select a batch of random samples, returns images and target
-def generate_real_samples(dataset, n_samples):
-    # choose random instances
+def real_samples(dataset, n_samples):
     ix = np.random.randint(0, dataset.shape[0], n_samples)
-    # retrieve selected images
     X1, X2 = dataset[ix], dataset[ix]
-    # generate 'real' class labels (1)
+    # 'real' class labels == 1
     y = np.ones((n_samples, 9, 9, 1))
+    
     return [X1, X2], y
 
 
 
-# generate a batch of images, returns images and targets
-def generate_fake_samples(g_model, samples):
-    # generate fake instance
-    X = g_model.predict(samples)
-    # create 'fake' class labels (0)
+def fake_samples(generator, samples):
+    X = generator.predict(samples)
+    # 'fake' class labels == 0
     y = np.zeros((len(X), 9, 9, 1))
+    
     return X, y
 
 
 
 # train pix2pix model
-def train(d_model, g_model, gan_model, dataset, n_epochs=20, n_batch=1):
-    # calculate the number of batches per training epoch
-    bat_per_epo = int(len(dataset) / n_batch)
-    # calculate the number of training iterations
-    n_steps = bat_per_epo * n_epochs
-    # manually enumerate epochs
-    for i in range(n_steps):
+def train(discriminator, generator, pix2pix, dataset, epochs=20, batch=1):
+    # number of batches per training epoch
+    batches = int(len(dataset) / batch)
+    # number of training steps
+    steps = batches * epochs
+    # training loop
+    for i in range(steps):
         # select a batch of real samples
-        [X_realA, X_realB], y_real = generate_real_samples(dataset, n_batch)
+        [X_realA, X_realB], y_real = real_samples(dataset, batch)
         # generate a batch of fake samples
-        X_fakeB, y_fake = generate_fake_samples(g_model, X_realA)
+        X_fakeB, y_fake = fake_samples(generator, X_realA)
         # update discriminator for real samples
-        d_loss1 = d_model.train_on_batch([X_realA, X_realB], y_real)
+        d_loss1 = discriminator.train_on_batch([X_realA, X_realB], y_real)
         # update discriminator for generated samples
-        d_loss2 = d_model.train_on_batch([X_realA, X_fakeB], y_fake)
+        d_loss2 = discriminator.train_on_batch([X_realA, X_fakeB], y_fake)
         # update the generator
-        g_loss, _, _ = gan_model.train_on_batch(X_realA, [y_real, X_realB])
+        g_loss, _, _ = pix2pix.train_on_batch(X_realA, [y_real, X_realB])
         # save the model each epoch
         if i % len(dataset) == 0:
-            print('>%d/%d, d1[%.3f] d2[%.3f] g[%.3f]' % (i+1, n_steps, d_loss1, d_loss2, g_loss))
-            g_model.save('unet' + str(i) +'.h5')
-            d_model.save('patchnet' + str(i) +'.h5')
-            gan_model.save('pix2pix' + str(i) +'.h5')
+            print('>%d/%d, d1[%.3f] d2[%.3f] g[%.3f]' % (i+1, steps, d_loss1, d_loss2, g_loss))
+            generator.save('unet' + str(i) +'.h5')
+            discriminator.save('patchnet' + str(i) +'.h5')
+            pix2pix.save('pix2pix' + str(i) +'.h5')
             
             
 def main():
