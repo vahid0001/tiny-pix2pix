@@ -1,6 +1,6 @@
 # Modified Pix2Pix
 
-Reimplementation the Pix2Pix model for a small image size dataset(like Cifar10) with fewer parameters and different PatchNet architecture
+Reimplementation the Pix2Pix model for a small image size dataset (like Cifar10) with fewer parameters and different PatchNet architecture
 
 # Important links
 [Google code[Tensoflow]](https://github.com/tensorflow/docs/blob/r2.0rc/site/en/r2/tutorials/generative/pix2pix.ipynb) </br>
