@@ -28,7 +28,7 @@ Patch-Net: The PatchGAN discriminator used in pix2pix is another unique componen
 </p>
 
 
-## Pix2Pix
+## Tiny Pix2Pix
 
 <p align="center">
   <img src="tiny_pix2pix.png">
