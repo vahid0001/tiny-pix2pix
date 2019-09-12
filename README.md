@@ -15,7 +15,7 @@ U-Net: The Generator in pix2pix resembles an auto-encoder. The Skip Connections 
 
 
 <p align="center">
-  <img src="unet.png">
+  <img src="U-Net.png">
 </p>
 
 
@@ -24,14 +24,14 @@ Patch-Net: The PatchGAN discriminator used in pix2pix is another unique componen
 
 
 <p align="center">
-  <img src="patchnet.png">
+  <img src="PatchNet.png">
 </p>
 
 
 ## Pix2Pix
 
 <p align="center">
-  <img src="pix2pix.png">
+  <img src="tiny_pix2pix.png">
 </p>
 
 # Result
