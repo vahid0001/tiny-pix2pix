@@ -14,10 +14,6 @@ Reimplementation of the Pix2Pix model for a small image size dataset (like Cifar
 U-Net: The Generator in pix2pix resembles an auto-encoder. The Skip Connections in the U-Net differentiate it from a standard Encoder-decoder architecture. The Generator takes in the Image to be translated and compresses it into a low-dimensional, “Bottleneck”, vector representation. The Generator then learns how to upsample this into the output image. The U-Net is similar to ResNets in the way that information from earlier layers are integrated into later layers. The U-Net skip connections are also interesting because they do not require any resizing, projections etc. since the spatial resolution of the layers being connected already match each other.
 
 
-<b>Input shape:</b> (32, 32, 3)   
-              
-<b>Output shape:</b> (32, 32, 3)
-
 <p align="center">
   <img src="unet.png">
 </p>
@@ -26,10 +22,6 @@ U-Net: The Generator in pix2pix resembles an auto-encoder. The Skip Connections 
 ## Discriminator
 Patch-Net: The PatchGAN discriminator used in pix2pix is another unique component to this design. The PatchGAN discriminator works by classifying individual (N x N) patches in the image as “real vs. fake”, opposed to classifying the entire image as “real vs. fake”. The authors reason that this enforces more constraints that encourage sharp high-frequency detail. Additionally, the PatchGAN has fewer parameters and runs faster than classifying the entire image.
 
-
-<b>Input shape:</b> (32, 32, 3), (32, 32, 3)    
-              
-<b>Output shape:</b> (9, 9, 1)
 
 <p align="center">
   <img src="patchnet.png">
