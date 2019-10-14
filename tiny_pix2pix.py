@@ -157,7 +157,7 @@ def main():
     # normalize data
     x_train = x_train / 127.5 - 1
     
-    # define Pix2Pix
+    # define tiny-pix2pix
     unet = define_unet()
     patchnet = define_patchnet()
     
