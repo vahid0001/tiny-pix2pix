@@ -125,7 +125,7 @@ def fake_samples(generator, samples):
 
 
 
-# train pix2pix model
+# train tiny-pix2pix model
 def train(discriminator, generator, pix2pix, dataset, epochs=20, batch=1):
     # number of batches per training epoch
     batches = int(len(dataset) / batch)
