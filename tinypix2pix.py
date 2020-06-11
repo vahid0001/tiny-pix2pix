@@ -52,9 +52,7 @@ class TinyPix2Pix():
         conv9 = keras.layers.Conv2D(16, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv9)
         conv9 = keras.layers.Conv2D(3, 3, activation='tanh', padding='same', kernel_initializer='he_normal')(conv9)
 
-        unet = keras.Model(input=inputs, output=conv9)
-
-        return unet
+        self.unet = keras.Model(input=inputs, output=conv9)
 
 
     def define_patchgan(self):
@@ -85,15 +83,13 @@ class TinyPix2Pix():
 
         x = keras.layers.Conv2D(1, 3, activation="sigmoid", padding="same")(x)
 
-        patchgan = keras.Model(input=[source_image, target_image], output=x)
-        patchgan.compile(optimizer=keras.optimizers.Adam(lr=1e-4), loss='binary_crossentropy')
-
-        return patchgan
+        self.patchgan = keras.Model(input=[source_image, target_image], output=x)
+        self.patchgan.compile(optimizer=keras.optimizers.Adam(lr=1e-4), loss='binary_crossentropy')
 
 
     def define_tinypix2pix(self):
-        self.unet = self.define_unet()
-        self.patchgan = self.define_patchgan()
+        self.define_unet()
+        self.define_patchgan()
 
         self.patchgan.trainable = False
 
@@ -109,19 +105,19 @@ class TinyPix2Pix():
 
     def real_samples(self, dataset):
         ix = np.random.randint(0, dataset.shape[0], self.batchsize)
-        x1, x2 = dataset[ix], dataset[ix]
+        x_realA, x_realB = dataset[ix], dataset[ix]
         # 'real' class labels == 1
-        y = np.ones((self.batchsize,) + self.patchgan.layers[-1].output_shape[1:])
+        y_real = np.ones((self.batchsize,) + self.patchgan.layers[-1].output_shape[1:])
 
-        return [x1, x2], y
+        return [x_realA, x_realB], y_real
 
 
-    def fake_samples(self, x_realA):
-        x = self.unet.predict(x_realA)
+    def fake_samples(self, x_real):
+        x_fake = self.unet.predict(x_real)
         # 'fake' class labels == 0
-        y = np.zeros((self.batchsize,) + self.patchgan.layers[-1].output_shape[1:])
+        y_fake = np.zeros((self.batchsize,) + self.patchgan.layers[-1].output_shape[1:])
 
-        return x, y
+        return x_fake, y_fake
 
 
     # train tinypix2pix model
@@ -160,7 +156,7 @@ def main():
     (x_train, _), (_, _) = keras.datasets.cifar10.load_data()
     x_train = x_train / 127.5 - 1
     # train model
-    model = TinyPix2Pix()
+    model = TinyPix2Pix(input_shape=(32, 32, 3), epochs=1, batchsize=1)
     model.fit(x_train)
 
 if __name__ == '__main__':
