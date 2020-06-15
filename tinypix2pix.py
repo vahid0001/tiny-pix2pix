@@ -3,10 +3,8 @@ import numpy as np
 import os
 
 class TinyPix2Pix():
-    def __init__(self, input_shape=(32, 32, 3), epochs=20, batchsize=1, model_dir='models'):
+    def __init__(self, input_shape=(32, 32, 3), model_dir='models'):
         self.input_shape = input_shape
-        self.epochs = epochs
-        self.batchsize = batchsize
         self.model_dir = model_dir
 
     def define_unet(self):
@@ -103,11 +101,11 @@ class TinyPix2Pix():
         self.tinypix2pix.compile(loss=['binary_crossentropy', 'mae'], optimizer=optimizer, loss_weights=[1, 100])
 
 
-    def real_samples(self, dataset):
-        ix = np.random.randint(0, dataset.shape[0], self.batchsize)
+    def real_samples(self, dataset, batchsize):
+        ix = np.random.randint(0, dataset.shape[0], batchsize)
         x_realA, x_realB = dataset[ix], dataset[ix]
         # 'real' class labels == 1
-        y_real = np.ones((self.batchsize,) + self.patchgan.layers[-1].output_shape[1:])
+        y_real = np.ones((batchsize,) + self.patchgan.layers[-1].output_shape[1:])
 
         return [x_realA, x_realB], y_real
 
@@ -115,17 +113,17 @@ class TinyPix2Pix():
     def fake_samples(self, x_real):
         x_fake = self.unet.predict(x_real)
         # 'fake' class labels == 0
-        y_fake = np.zeros((self.batchsize,) + self.patchgan.layers[-1].output_shape[1:])
+        y_fake = np.zeros((len(x_fake),) + self.patchgan.layers[-1].output_shape[1:])
 
         return x_fake, y_fake
 
 
     # train tinypix2pix model
-    def fit(self, dataset):
+    def fit(self, dataset, epochs, batchsize):
         # number of batches per training epoch
-        batches = int(len(dataset) / self.batchsize)
+        batches = int(len(dataset) / batchsize)
         # number of training steps
-        steps = batches * self.epochs
+        steps = batches * epochs
         # make directory for saving models
         os.makedirs(self.model_dir, exist_ok=True)
 
@@ -134,7 +132,7 @@ class TinyPix2Pix():
         # training loop
         for i in range(steps):
             # select a batch of real samples
-            [x_realA, x_realB], y_real = self.real_samples(dataset)
+            [x_realA, x_realB], y_real = self.real_samples(dataset, batchsize)
             # generate a batch of fake samples
             x_fakeB, y_fake = self.fake_samples(x_realA)
             # update discriminator for real samples
@@ -156,8 +154,8 @@ def main():
     (x_train, _), (_, _) = keras.datasets.cifar10.load_data()
     x_train = x_train / 127.5 - 1
     # train model
-    model = TinyPix2Pix(input_shape=(32, 32, 3), epochs=1, batchsize=1)
-    model.fit(x_train)
+    model = TinyPix2Pix(input_shape=(32, 32, 3))
+    model.fit(x_train, epochs=1, batchsize=1)
 
 if __name__ == '__main__':
     main()
