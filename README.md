@@ -32,16 +32,3 @@ PatchGAN: The discriminator used in pix2pix is another unique component to this 
 <p align="center">
   <img src="tiny_pix2pix.png">
 </p>
-
-# Result
-[Our paper](https://ieeexplore.ieee.org/document/9116887) </br>
-
-We used this model to reconstruct the occluded portion of images to increase the performance of our classifier under this challenging condition.
-
-<p align="center">
-  <img src="cat_occlusion_reconstruction.png">
-</p>
-
-<p align="center">
-  <img src="performance_model.png">
-</p>
